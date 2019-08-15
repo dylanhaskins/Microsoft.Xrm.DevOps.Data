@@ -25,6 +25,9 @@ namespace Microsoft.Xrm.DevOps.Data.PowerShell.Cmdlets
         [Parameter(Position = 4)]
         public Boolean DisablePluginsGlobally = false;
 
+        [Parameter(Position = 5)]
+        public string DateFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss"; //Default to Format used by DataMigrationUtility
+
         protected override void ProcessRecord()
         {
             GenerateVerboseMessage("Generating DataBuilder Instance.");
@@ -64,6 +67,12 @@ namespace Microsoft.Xrm.DevOps.Data.PowerShell.Cmdlets
             {
                 GenerateVerboseMessage("Disabling plugins globally.");
                 db.SetPluginsDisabled(true);
+            }
+
+            if (!string.IsNullOrEmpty(this.DateFormat))
+            {
+                GenerateVerboseMessage("Setting DateFormat");
+                db.SetDateFormat(this.DateFormat);
             }
 
             try

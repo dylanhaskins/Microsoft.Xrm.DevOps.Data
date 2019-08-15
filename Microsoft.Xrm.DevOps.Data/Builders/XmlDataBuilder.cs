@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Xml;
@@ -12,8 +13,14 @@ namespace Microsoft.Xrm.DevOps.Data
 {
     internal class XmlDataBuilder
     {
-        internal static XmlDocument ToXmlDocument(Dictionary<string, BuilderEntityMetadata> entities)
+        private static string _DateFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss";
+        internal static XmlDocument ToXmlDocument(Dictionary<string, BuilderEntityMetadata> entities, string dateformat)
         {
+            if (!string.IsNullOrEmpty(dateformat))
+            {
+                _DateFormat = dateformat;
+            }
+
             XmlDocument xd = null;
             XmlSerializer xmlSerializer = new XmlSerializer(typeof (DataXml.Entities));
             using (MemoryStream memStm = new MemoryStream())
@@ -166,8 +173,7 @@ namespace Microsoft.Xrm.DevOps.Data
 
             switch (attributeMetadata.AttributeType)
             {
-                case Sdk.Metadata.AttributeTypeCode.Boolean:
-                case Sdk.Metadata.AttributeTypeCode.DateTime:       // If need to convert to UTC may need to be isolated
+                case Sdk.Metadata.AttributeTypeCode.Boolean:               
                 case Sdk.Metadata.AttributeTypeCode.Decimal:        // Precision should carry from initial value
                 case Sdk.Metadata.AttributeTypeCode.Double:
                 case Sdk.Metadata.AttributeTypeCode.Integer:
@@ -175,6 +181,10 @@ namespace Microsoft.Xrm.DevOps.Data
                 case Sdk.Metadata.AttributeTypeCode.String:
                 case Sdk.Metadata.AttributeTypeCode.Uniqueidentifier:
                     FieldNode.Value = attribute.Value.ToString();
+                    break;
+                case Sdk.Metadata.AttributeTypeCode.DateTime:       // If need to convert to UTC may need to be isolated
+                    FieldNode.Value = ((DateTime)attribute.Value).ToString(_DateFormat);
+                    //_DateFormat, CultureInfo.InvariantCulture
                     break;
                 case Sdk.Metadata.AttributeTypeCode.Money:
                     FieldNode.Value = ((Microsoft.Xrm.Sdk.Money)attribute.Value).Value.ToString();

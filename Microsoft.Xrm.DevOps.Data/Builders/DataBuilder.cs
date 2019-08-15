@@ -16,6 +16,7 @@ namespace Microsoft.Xrm.DevOps.Data
         private Dictionary<String, BuilderEntityMetadata> _Entities = new Dictionary<String, BuilderEntityMetadata>();
         private Boolean? _PluginsDisabled = null;
         private IOrganizationService _service;
+        private string _DateFormat;
         public IOrganizationService Service {
             get { 
                 return _service; 
@@ -285,6 +286,11 @@ namespace Microsoft.Xrm.DevOps.Data
             this._PluginsDisabled = disabled;
         }
 
+        public void SetDateFormat(string dateformat)
+        {
+            this._DateFormat = dateformat;
+        }
+
         public void SetPluginsDisabled(String logicalName, Boolean disabled)
         {
             this.VerifyEntityExists(logicalName);
@@ -321,7 +327,7 @@ namespace Microsoft.Xrm.DevOps.Data
                 this.FinalizeEntity(logicalName);
             });
 
-            return XmlDataBuilder.ToXmlDocument(_Entities);
+            return XmlDataBuilder.ToXmlDocument(_Entities, _DateFormat);
         }
 
         public XmlDocument BuildContentTypesXML()
